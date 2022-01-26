@@ -18,6 +18,8 @@ Cost of Loader = 2k/day
 Cost of Scaler = 3k/day
 
 ![Loading Time Distribution](https://github.com/CSBebo/Genetic-Algorithm/blob/master/My%20Genetic%20Algorithm%20GUI/Loading%20Time.JPG)
+
 ![Traveling Time Distribution](https://github.com/CSBebo/Genetic-Algorithm/blob/master/My%20Genetic%20Algorithm%20GUI/Weighing%20Time.JPG)
+
 ![Traveling
 Time Distribution](https://github.com/CSBebo/Genetic-Algorithm/blob/master/My%20Genetic%20Algorithm%20GUI/Travel%20Time.JPG)

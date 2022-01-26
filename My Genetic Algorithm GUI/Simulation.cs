@@ -269,7 +269,7 @@ namespace Simulation
 
             results.utilTruck = totalTimeTruck / totalTime / numTruck;
             results.utilLoader = totalTimeLoader / totalTime / numLoader;
-            results.utilScaler = totalTimeScaler / totalTime / numLoader;
+            results.utilScaler = totalTimeScaler / totalTime / numScaler;
             results.totalCost = totalCost;
             results.totalCostTruck = costTruck;
             results.totalCostLoader = costLoader;

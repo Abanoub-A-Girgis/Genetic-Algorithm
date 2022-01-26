@@ -88,36 +88,54 @@ namespace Simulation
             float totalTimeTruck = 0;
             float totalTimeLoader = 0;
             float totalTimeScaler = 0;
-
+            int min;
             while (coalRemaining > numTruck * numTruckLoad)
             {
-                foreach (Truck truck in trucks)
+                min = 2147483647;
+                for(int i = 0; i < numTruck; i++)
                 {
-
-                    if (truck.State == states.Loading)
+                    if (!(trucks[i].LoadingTimeLeft != 0 && trucks[i].WeighingTimeLeft != 0 && trucks[i].TravelingTimeLeft != 0))
                     {
-                        if (!loadingQ.Contains(truck))
+                        if (trucks[i].State == states.Loading)
                         {
-                            loadingQ.Add(truck);
-                            truck.addToLoading();
+                            if (!loadingQ.Contains(trucks[i]))
+                            {
+                                loadingQ.Add(trucks[i]);
+                                trucks[i].addToLoading();
+                            }
+                        }
+                        else if (trucks[i].State == states.Weighing)
+                        {
+                            if (!weighingQ.Contains(trucks[i]))
+                            {
+                                weighingQ.Add(trucks[i]);
+                                trucks[i].addToWeighing();
+                            }
+                        }
+                        else
+                        {
+                            if (!travelingQ.Contains(trucks[i]))
+                            {
+                                travelingQ.Add(trucks[i]);
+                                trucks[i].addToTraveling();
+                            }
                         }
 
-                    }
-                    else if (truck.State == states.Weighing)
-                    {
-                        if (!weighingQ.Contains(truck))
+                        if (trucks[i].LoadingTimeLeft < min && trucks[i].LoadingTimeLeft != 0)
                         {
-                            weighingQ.Add(truck);
-                            truck.addToWeighing();
+                            min = trucks[i].LoadingTimeLeft;
                         }
-
-                    }
-                    else
-                    {
-                        if (!travelingQ.Contains(truck))
+                        if (trucks[i].WeighingTimeLeft < min && trucks[i].WeighingTimeLeft != 0)
                         {
-                            travelingQ.Add(truck);
-                            truck.addToTraveling();
+                            min = trucks[i].WeighingTimeLeft;
+                        }
+                        if (trucks[i].TravelingTimeLeft < min && trucks[i].TravelingTimeLeft != 0)
+                        {
+                            min = trucks[i].TravelingTimeLeft;
+                        }
+                        if (trucks[i].LoadingTimeLeft == 0 && trucks[i].WeighingTimeLeft == 0 && trucks[i].TravelingTimeLeft == 0)
+                        {
+                            min = 1;
                         }
                     }
                 }
@@ -132,8 +150,8 @@ namespace Simulation
                         loadingQ.RemoveAt(i);
                     }
 
-                    totalTimeTruck += 1;
-                    totalTimeLoader += 1;
+                    totalTimeTruck += min;
+                    totalTimeLoader += min;
                 }
 
                 for (int i = 0; i < Math.Min(numScaler, weighingQ.Count); i++)
@@ -146,8 +164,8 @@ namespace Simulation
                         weighingQ.RemoveAt(i);
                     }
 
-                    totalTimeTruck += 1;
-                    totalTimeScaler += 1;
+                    totalTimeTruck += min;
+                    totalTimeScaler += min;
                 }
 
                 for (int i = 0; i < travelingQ.Count; i++)
@@ -161,18 +179,18 @@ namespace Simulation
                         coalRemaining -= numTruckLoad;
                     }
 
-                    totalTimeTruck += 1;
+                    totalTimeTruck += min;
                 }
 
-                totalTime += 1;
+                totalTime += min;
 
             }
 
             while (coalRemaining > 0)
             {
+                min = 2147483647;
                 for (int j = 0; j < Math.Ceiling(coalRemaining / numTruckLoad); j++)
                 {
-
                     if (trucks[j].State == states.Loading)
                     {
                         if (!loadingQ.Contains(trucks[j]))
@@ -180,7 +198,6 @@ namespace Simulation
                             loadingQ.Add(trucks[j]);
                             trucks[j].addToLoading();
                         }
-
                     }
                     else if (trucks[j].State == states.Weighing)
                     {
@@ -189,7 +206,6 @@ namespace Simulation
                             weighingQ.Add(trucks[j]);
                             trucks[j].addToWeighing();
                         }
-
                     }
                     else
                     {
@@ -199,6 +215,23 @@ namespace Simulation
                             trucks[j].addToTraveling();
                         }
                     }
+
+                    if (trucks[j].LoadingTimeLeft < min && trucks[j].LoadingTimeLeft != 0)
+                    {
+                        min = trucks[j].LoadingTimeLeft;
+                    }
+                    if (trucks[j].WeighingTimeLeft < min && trucks[j].WeighingTimeLeft != 0)
+                    {
+                        min = trucks[j].WeighingTimeLeft;
+                    }
+                    if (trucks[j].TravelingTimeLeft < min && trucks[j].TravelingTimeLeft != 0)
+                    {
+                        min = trucks[j].TravelingTimeLeft;
+                    }
+                    if (trucks[j].LoadingTimeLeft == 0 && trucks[j].WeighingTimeLeft == 0 && trucks[j].TravelingTimeLeft == 0)
+                    {
+                        min = 1;
+                    }
                 }
 
                 for (int i = 0; i < Math.Min(numLoader, loadingQ.Count); i++)
@@ -211,8 +244,8 @@ namespace Simulation
                         loadingQ.RemoveAt(i);
                     }
 
-                    totalTimeTruck += 1;
-                    totalTimeLoader += 1;
+                    totalTimeTruck += min;
+                    totalTimeLoader += min;
                 }
 
                 for (int i = 0; i < Math.Min(numScaler, weighingQ.Count); i++)
@@ -225,8 +258,8 @@ namespace Simulation
                         weighingQ.RemoveAt(i);
                     }
 
-                    totalTimeTruck += 1;
-                    totalTimeScaler += 1;
+                    totalTimeTruck += min;
+                    totalTimeScaler += min;
                 }
 
                 for (int i = 0; i < travelingQ.Count; i++)
@@ -240,10 +273,10 @@ namespace Simulation
                         coalRemaining -= numTruckLoad;
                     }
 
-                    totalTimeTruck += 1;
+                    totalTimeTruck += min;
                 }
 
-                totalTime += 1;
+                totalTime += min;
             }
 
             totalDays = Math.Ceiling(totalTime / 480);

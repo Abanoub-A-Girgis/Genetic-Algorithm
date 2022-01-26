@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Simulation;
 using GeneticAlgo;
+using System.Threading;
 
 namespace My_Genetic_Algorithm_GUI
 {
@@ -49,66 +50,55 @@ namespace My_Genetic_Algorithm_GUI
                 progressBar1.Maximum = lastGeneration;
 
                 GeneticAlgo.program.GeneticAlgoResults r = new GeneticAlgo.program.GeneticAlgoResults();
-                r = GeneticAlgo(population, numCoal, numTruckLoad, costTruckPD, costLoaderPD, costScalerPD, projectDuration, costDelayPD, numTruck, numLoader, numScaler, lastGeneration);
+                GeneticAlgo(population, numCoal, numTruckLoad, costTruckPD, costLoaderPD, costScalerPD, projectDuration, costDelayPD, numTruck, numLoader, numScaler, lastGeneration, ref r);
               
-                    lblTruckNoAlgo.Text = r.BestGene.Genes[0].ToString();
-                    lblLoaderNoAlgo.Text = r.BestGene.Genes[1].ToString();
-                    lblScalerNoAlgo.Text = r.BestGene.Genes[2].ToString();
-                    lblUtiliLoaderAlgo.Text = Math.Round(r.BestGene.utilLoader, 3).ToString();
-                    lblUtiliScalerAlgo.Text = Math.Round(r.BestGene.utilScaler, 3).ToString();
-                    lblUtiliTruckAlgo.Text = Math.Round(r.BestGene.utilTruck, 3).ToString();
-                    lblDaysDelayedAlgo.Text = r.BestGene.DaysofDelay.ToString();
-                    lblCostodDelayAlgo.Text = r.BestGene.CostofDelay.ToString();
-                    lblTotalDaysAlgo.Text = r.BestGene.TotalDays.ToString();
-                    lblTotalCostAlgo.Text = r.BestGene.TotalCost.ToString();
+                lblTruckNoAlgo.Text = r.BestGene.Genes[0].ToString();
+                lblLoaderNoAlgo.Text = r.BestGene.Genes[1].ToString();
+                lblScalerNoAlgo.Text = r.BestGene.Genes[2].ToString();
+                lblUtiliLoaderAlgo.Text = Math.Round(r.BestGene.utilLoader, 3).ToString();
+                lblUtiliScalerAlgo.Text = Math.Round(r.BestGene.utilScaler, 3).ToString();
+                lblUtiliTruckAlgo.Text = Math.Round(r.BestGene.utilTruck, 3).ToString();
+                lblDaysDelayedAlgo.Text = r.BestGene.DaysofDelay.ToString();
+                lblCostodDelayAlgo.Text = r.BestGene.CostofDelay.ToString();
+                lblTotalDaysAlgo.Text = r.BestGene.TotalDays.ToString();
+                lblTotalCostAlgo.Text = r.BestGene.TotalCost.ToString();
             }
             catch (Exception ex)
             {
 
                 MessageBox.Show(ex.Message);
             }
-          
-            GeneticAlgo.program.GeneticAlgoResults GeneticAlgo(int size, float numCoal, float numTruckLoad, float costTruckPD, float costLoaderPD, float costScalerPD, float projectDuration, float costDelayPD, int numTruck, int numLoader, int numScaler, int lastGeneration)
+        }
+
+        void GeneticAlgo(int size, float numCoal, float numTruckLoad, float costTruckPD, float costLoaderPD, float costScalerPD, float projectDuration, float costDelayPD, int numTruck, int numLoader, int numScaler, int lastGeneration, ref program.GeneticAlgoResults res)
+        {
+            GeneticAlgo.program.GeneticAlgorithm Population;
+            int x = 0;
+            //float numCoal = 10000, numTruckLoad = 20, costTruckPD = 1000, costLoaderPD = 2000, costScalerPD = 3000, projectDuration = 120, costDelayPD = 10000;
+            Population = new GeneticAlgo.program.GeneticAlgorithm(size, numTruck, numLoader, numScaler, FitnessFunction, numCoal);
+            GeneticAlgo.program.GeneticAlgoResults Results = new GeneticAlgo.program.GeneticAlgoResults();
+            while (true)
             {
-                GeneticAlgo.program.GeneticAlgorithm Population;
-                int x = 0;
-                //float numCoal = 10000, numTruckLoad = 20, costTruckPD = 1000, costLoaderPD = 2000, costScalerPD = 3000, projectDuration = 120, costDelayPD = 10000;
-                Population = new GeneticAlgo.program.GeneticAlgorithm(size, numTruck, numLoader, numScaler, FitnessFunction, numCoal);
-                GeneticAlgo.program.GeneticAlgoResults Results = new GeneticAlgo.program.GeneticAlgoResults();
-                while (true)
+                x++;
+                progressBar1.Value = x;
+                chart1.Series["Series1"].Points.AddXY(x, Population.BestofEachGeneration.Fitness);
+                chart1.Update();
+                if (x == lastGeneration)
                 {
-                    x++;
-                    progressBar1.Value = x;
-                    chart1.Series["Series1"].Points.AddXY(x, Population.BestofEachGeneration.Fitness);
-                    chart1.Update();
-                    if (x == lastGeneration)
-                    {
-                        break;
-                    }
-                    Population.NewGeneration();
+                    break;
                 }
-
-                Results.BestGeneration = Population.BestGeneGeneration;
-                Results.BestGene = Population.BestGene;
-
-                Simu.Sim FitnessFunction(float numTrucks, float numLoaders, float numScalers)
-                {
-                    Simu.Sim simResults = Simu.Simulate(numCoal, numTrucks, numTruckLoad, costTruckPD, numLoaders, costLoaderPD, numScalers, costScalerPD, projectDuration, costDelayPD, loadingElements, weighingElements, travelingElements);
-                    return simResults;
-                }
-                return Results;
+                Population.NewGeneration();
             }
 
-        }
+            Results.BestGeneration = Population.BestGeneGeneration;
+            Results.BestGene = Population.BestGene;
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void groupBox2_Enter(object sender, EventArgs e)
-        {
-
+            Simu.Sim FitnessFunction(float numTrucks, float numLoaders, float numScalers)
+            {
+                Simu.Sim simResults = Simu.Simulate(numCoal, numTrucks, numTruckLoad, costTruckPD, numLoaders, costLoaderPD, numScalers, costScalerPD, projectDuration, costDelayPD, loadingElements, weighingElements, travelingElements);
+                return simResults;
+            }
+            res = Results;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -264,40 +254,10 @@ namespace My_Genetic_Algorithm_GUI
             chart1.Series["Series1"].Points.Clear();
             progressBar1.Visible = true;
             progressBar1.Minimum = 1;
-            progressBar1.Maximum = 100;
-            GeneticAlgo.program.GeneticAlgoResults GeneticAlgo(int size=100, float numCoal=10000, float numTruckLoad=20, float costTruckPD=1000, float costLoaderPD=2000, float costScalerPD=3000, float projectDuration=120, float costDelayPD=10000, int numTruck=6, int numLoader=2, int numScaler=2)
-            {
-                GeneticAlgo.program.GeneticAlgorithm Population;
-                int x = 0;
-                //float numCoal = 10000, numTruckLoad = 20, costTruckPD = 1000, costLoaderPD = 2000, costScalerPD = 3000, projectDuration = 120, costDelayPD = 10000;
-                Population = new GeneticAlgo.program.GeneticAlgorithm(size, numTruck, numLoader, numScaler, FitnessFunction, numCoal);
-                GeneticAlgo.program.GeneticAlgoResults Results = new GeneticAlgo.program.GeneticAlgoResults();
-                while (true)
-                {
-                    x++;
-                    progressBar1.Value = x;
-                    chart1.Series["Series1"].Points.AddXY(x, Population.BestofEachGeneration.Fitness);
-                    chart1.Update();
-                    if (x == 100)
-                    {
-                        break;
-                    }
-                    Population.NewGeneration();
-                }
-
-                Results.BestGeneration = Population.BestGeneGeneration;
-                Results.BestGene = Population.BestGene;
-
-                Simu.Sim FitnessFunction(float numTrucks, float numLoaders, float numScalers)
-                {
-                    Simu.Sim simResults = Simu.Simulate(numCoal, numTrucks, numTruckLoad, costTruckPD, numLoaders, costLoaderPD, numScalers, costScalerPD, projectDuration, costDelayPD, loadingElements, weighingElements, travelingElements);
-                    return simResults;
-                }
-                return Results;
-            }
+            progressBar1.Maximum = 100; 
 
             GeneticAlgo.program.GeneticAlgoResults r = new GeneticAlgo.program.GeneticAlgoResults();
-            r = GeneticAlgo(20, 10000, 20, 1000, 2000, 3000, 120, 10000, 6, 2, 2);
+            GeneticAlgo(20, 10000, 20, 1000, 2000, 3000, 120, 10000, 6, 2, 2, 100, ref r);
             try
             {
                 lblTruckNoAlgo.Text = r.BestGene.Genes[0].ToString();
@@ -315,11 +275,8 @@ namespace My_Genetic_Algorithm_GUI
             }
             catch (Exception ex)
             {
-
                MessageBox.Show(ex.Message);
             }
-
-
         }
 
         /// <summary>
@@ -373,7 +330,6 @@ namespace My_Genetic_Algorithm_GUI
             txtbxlodrprtrukAlgo.Clear();
             txtbxLosderNoMxAlgo.Clear();
             txtbxProjectDurationAlgo.Clear();
-
         }
     }
 }

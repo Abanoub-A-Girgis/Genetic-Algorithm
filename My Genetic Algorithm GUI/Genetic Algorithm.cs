@@ -79,6 +79,7 @@ namespace GeneticAlgo
                 {
                     child.Genes[i] = random.NextDouble() < 0.5 ? Genes[i] : Parent2.Genes[i];
                 }
+
                 child.fitnessFunction = fitnessFunction;
                 return child;
             }
@@ -133,6 +134,7 @@ namespace GeneticAlgo
                 {
                     Population.Add(new DNA(maxTrucks, maxLoaders, maxScalers, fitnessFunction, numCoal));
                 }
+
                 BestGene = Population[0];
                 totalFitnessCalc();
             }
@@ -191,7 +193,6 @@ namespace GeneticAlgo
                     Child = Parent1.CrossOver(Parent2);
                     Child.Mutate();
                     newPopulation.Add(Child);
-
                 }
 
                 Population = newPopulation;
@@ -206,6 +207,5 @@ namespace GeneticAlgo
                 return s;
             }
         }
-
     }
 }

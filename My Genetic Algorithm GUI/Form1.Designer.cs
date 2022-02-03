@@ -1700,4 +1700,3 @@
         private System.Windows.Forms.TabControl tabControl1;
     }
 }
-

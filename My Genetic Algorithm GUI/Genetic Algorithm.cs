@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Simulation;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GeneticAlgo
 {
@@ -130,10 +132,19 @@ namespace GeneticAlgo
                 Population = new List<DNA>(populationSize);
                 newPopulation = new List<DNA>(populationSize);
 
-                for (int i = 0; i < populationSize; i++)
+                // Using Serial Processing
+
+                //for (int i = 0; i < populationSize; i++)
+                //{
+                //    Population.Add(new DNA(maxTrucks, maxLoaders, maxScalers, fitnessFunction, numCoal));
+                //}
+
+                // Using Parallel Processing
+
+                Parallel.For(0, populationSize, i =>
                 {
                     Population.Add(new DNA(maxTrucks, maxLoaders, maxScalers, fitnessFunction, numCoal));
-                }
+                });
 
                 BestGene = Population[0];
                 totalFitnessCalc();
@@ -185,8 +196,22 @@ namespace GeneticAlgo
             {
                 DNA Parent1, Parent2, Child;
                 newPopulation = new List<DNA>(Population.Count);
-                for (int i = 0; i < Population.Count; i++)
-                {
+
+                // Using Serial Processing
+
+                //for (int i = 0; i < Population.Count; i++)
+                //{
+                //    Parent1 = Selection();
+                //    Parent2 = Selection();
+
+                //    Child = Parent1.CrossOver(Parent2);
+                //    Child.Mutate();
+                //    newPopulation.Add(Child);
+                //}
+
+                // Using Parallel Processing
+
+                Parallel.For(0, Population.Count, i => {
                     Parent1 = Selection();
                     Parent2 = Selection();
 
@@ -194,6 +219,7 @@ namespace GeneticAlgo
                     Child.Mutate();
                     newPopulation.Add(Child);
                 }
+                );
 
                 Population = newPopulation;
                 totalFitnessCalc();

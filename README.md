@@ -1,5 +1,5 @@
 # Genetic-Algorithm
-A Genetic Algorithm created to solve The Dump Truck Problem created as a final project for the Engineering Optimization Course for the CEI track in the ITI.
+A Genetic Algorithm solution for The Dump Truck Problem created as a final project for the Engineering Optimization Course for the CEI track in the ITI.
 
 The Genetic Algorithm used in this the Roulette Wheel selection via uniform crossover with mutation where the fitness is calculated by running a simulation that randomly selects loading time, weighing time and traveling time according to their probability, the fitness is calculated as 1/(totalcost+1) multiplied by a constant factor to to make the number look more natural.
 The simulation and genetic algorithm were all coded from scratch without using an extenal library
